@@ -2,3 +2,13 @@
 .claude/
 *.log
 node_modules/
+
+# Raw asset source folders — not needed for deploy (WebPs are in /images/)
+/logo/
+/ทาวน์โฮม/
+/บ้านเดี่ยว 2 ชั้น/
+/บ้านเดี่ยว ชั้นเดียว /
+/บ้านแฝด/
+/ส่วนกลาง/
+/ผังโครงการ_MasterPlan/
+/ข้อมูลโครงการ /
