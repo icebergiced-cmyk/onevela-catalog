@@ -1,6 +1,6 @@
 /* ===========================
    วันเวลา · One Vela — Flipbook engine
-   Handles: StPageFlip init, mode switch, a11y, keyboard nav, deep-link
+   StPageFlip init + mode switch + a11y + keyboard nav + deep-link
    =========================== */
 
 (function () {
@@ -8,8 +8,6 @@
 
   const BREAKPOINT = 1024;
   const STORAGE_KEY = 'onevela_mode';
-  const PAGE_W = 800;
-  const PAGE_H = 1131;
 
   const body = document.body;
   const book = document.getElementById('book');
@@ -18,121 +16,172 @@
   const btnScroll = document.getElementById('mode-scroll');
   const flipHint = document.getElementById('flip-hint');
 
-  const pages = Array.from(book.querySelectorAll('.page'));
-  const totalPages = pages.length;
+  if (!book) {
+    console.warn('[flipbook] #book not found, abort');
+    return;
+  }
 
+  let totalPages = book.querySelectorAll('.page').length;
   let pageFlip = null;
   let currentMode = null;
+  let bookNavEl = null;
 
-  /* ---------- Mode detection ---------- */
+  /* ---------- helpers ---------- */
   function pickMode() {
-    // Honor stored preference if window can support it
     const stored = localStorage.getItem(STORAGE_KEY);
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const widthOk = window.innerWidth >= BREAKPOINT;
     if (reducedMotion) return 'scroll';
-    if (!widthOk) return 'scroll';
+    if (window.innerWidth < BREAKPOINT) return 'scroll';
     if (stored === 'book' || stored === 'scroll') return stored;
     return 'book';
   }
 
-  /* ---------- Folio update ---------- */
   function updateFolio(pageNum) {
-    if (!folioEl) return;
-    folioEl.textContent = `หน้า ${pageNum} / ${totalPages}`;
+    if (folioEl) folioEl.textContent = `หน้า ${pageNum} / ${totalPages}`;
   }
 
-  /* ---------- Book mode (StPageFlip) ---------- */
-  function initBookMode() {
-    if (pageFlip) return; // already initialized
-    if (typeof St === 'undefined' || !St.PageFlip) {
-      console.warn('StPageFlip not loaded — falling back to scroll mode');
-      setMode('scroll');
+  function setBtnState(mode) {
+    if (btnBook) btnBook.setAttribute('aria-pressed', mode === 'book');
+    if (btnScroll) btnScroll.setAttribute('aria-pressed', mode === 'scroll');
+  }
+
+  /* ---------- wait for StPageFlip CDN ---------- */
+  function waitForSt(maxMs = 5000) {
+    return new Promise((resolve) => {
+      if (typeof St !== 'undefined' && St.PageFlip) return resolve(true);
+      const start = Date.now();
+      const tick = () => {
+        if (typeof St !== 'undefined' && St.PageFlip) return resolve(true);
+        if (Date.now() - start > maxMs) return resolve(false);
+        setTimeout(tick, 80);
+      };
+      tick();
+    });
+  }
+
+  /* ---------- book mode ---------- */
+  async function initBookMode() {
+    if (pageFlip) return;
+
+    const ready = await waitForSt();
+    if (!ready) {
+      console.error('[flipbook] StPageFlip CDN failed to load — staying in scroll mode');
+      forceScrollFallback();
       return;
     }
 
-    // Create container element (StPageFlip will wrap our pages)
-    pageFlip = new St.PageFlip(book, {
-      width: PAGE_W,
-      height: PAGE_H,
-      size: 'stretch',
-      minWidth: 340,
-      maxWidth: PAGE_W,
-      minHeight: 480,
-      maxHeight: PAGE_H,
-      maxShadowOpacity: 0.35,
-      showCover: true,
-      mobileScrollSupport: false,
-      usePortrait: false,
-      drawShadow: true,
-      flippingTime: 700,
-      useMouseEvents: true,
-      swipeDistance: 30,
-      clickEventForward: true, // let inner <a> clicks bubble
-    });
+    // re-query pages live (they're still direct children of #book)
+    const pages = book.querySelectorAll('.page');
+    totalPages = pages.length;
 
-    pageFlip.loadFromHTML(pages);
-    pageFlip.on('flip', (e) => {
-      const idx = e.data; // 0-based
-      updateFolio(idx + 1);
-      // Update URL hash for deep-linking
-      const page = pages[idx];
-      if (page && page.id) {
-        history.replaceState(null, '', '#' + page.id);
-      }
-    });
+    try {
+      pageFlip = new St.PageFlip(book, {
+        width: 800,
+        height: 1131,
+        size: 'stretch',
+        minWidth: 380,
+        maxWidth: 900,
+        minHeight: 540,
+        maxHeight: 1280,
+        drawShadow: true,
+        flippingTime: 700,
+        usePortrait: false,
+        autoSize: true,
+        maxShadowOpacity: 0.35,
+        showCover: true,
+        mobileScrollSupport: false,
+        useMouseEvents: true,
+        swipeDistance: 30,
+        clickEventForward: true,
+        showPageCorners: true,
+      });
 
-    pageFlip.on('init', (e) => {
-      updateFolio((e.data?.page ?? 0) + 1);
-      // Restore deep-link
-      const targetId = (location.hash || '').replace('#', '');
-      if (targetId) {
-        const idx = pages.findIndex(p => p.id === targetId);
-        if (idx >= 0) pageFlip.turnToPage(idx);
-      }
-    });
+      pageFlip.loadFromHTML(pages);
 
-    // Show flip hint briefly
-    if (flipHint) {
-      flipHint.classList.add('visible');
-      setTimeout(() => flipHint.classList.remove('visible'), 5000);
+      pageFlip.on('flip', (e) => {
+        const idx = e.data;
+        updateFolio(idx + 1);
+        const targetPage = pages[idx];
+        if (targetPage && targetPage.id) {
+          history.replaceState(null, '', '#' + targetPage.id);
+        }
+      });
+
+      pageFlip.on('init', (e) => {
+        const idx = (e.data && e.data.page) || 0;
+        updateFolio(idx + 1);
+        // restore deep-link
+        const targetId = (location.hash || '').replace('#', '');
+        if (targetId) {
+          const tIdx = Array.from(pages).findIndex(p => p.id === targetId);
+          if (tIdx >= 0) pageFlip.turnToPage(tIdx);
+        }
+      });
+
+      mountBookNav();
+      showHint();
+    } catch (err) {
+      console.error('[flipbook] init failed', err);
+      forceScrollFallback();
     }
+  }
 
-    // Add nav buttons
-    if (!document.querySelector('.book-nav')) {
-      const nav = document.createElement('div');
-      nav.className = 'book-nav';
-      nav.innerHTML = `
-        <button id="bk-prev" aria-label="หน้าก่อน">←</button>
-        <button id="bk-next" aria-label="หน้าถัดไป">→</button>
-      `;
-      document.body.appendChild(nav);
-      document.getElementById('bk-prev').addEventListener('click', () => pageFlip?.flipPrev());
-      document.getElementById('bk-next').addEventListener('click', () => pageFlip?.flipNext());
+  function forceScrollFallback() {
+    localStorage.setItem(STORAGE_KEY, 'scroll');
+    body.setAttribute('data-mode', 'scroll');
+    currentMode = 'scroll';
+    setBtnState('scroll');
+    if (btnBook) {
+      btnBook.disabled = true;
+      btnBook.title = 'โหลด flipbook ไม่ได้';
+      btnBook.style.opacity = '0.4';
     }
+    initScrollMode();
   }
 
   function destroyBookMode() {
     if (!pageFlip) return;
-    try {
-      pageFlip.destroy();
-    } catch (e) { /* noop */ }
+    try { pageFlip.destroy(); } catch (e) { /* noop */ }
     pageFlip = null;
-    // StPageFlip might leave wrapper — clean if present
+
+    // remove StPageFlip wrapper artifacts and ensure pages are back as #book children
     const wrapper = document.querySelector('.stf__parent');
-    if (wrapper) {
-      // Move pages back to #book
+    if (wrapper && wrapper !== book) {
       const items = wrapper.querySelectorAll('.page');
       items.forEach(p => book.appendChild(p));
       wrapper.remove();
     }
-    const nav = document.querySelector('.book-nav');
-    if (nav) nav.remove();
+    // also reset any inline styles StPageFlip applied to #book itself
+    book.removeAttribute('style');
+    book.classList.remove('stf__parent');
+    unmountBookNav();
   }
 
-  /* ---------- Scroll mode ---------- */
+  /* ---------- nav arrows (book mode only) ---------- */
+  function mountBookNav() {
+    if (bookNavEl) return;
+    bookNavEl = document.createElement('div');
+    bookNavEl.className = 'book-nav';
+    bookNavEl.innerHTML = `
+      <button type="button" id="bk-prev" aria-label="หน้าก่อน">←</button>
+      <button type="button" id="bk-next" aria-label="หน้าถัดไป">→</button>
+    `;
+    document.body.appendChild(bookNavEl);
+    document.getElementById('bk-prev').addEventListener('click', () => pageFlip && pageFlip.flipPrev());
+    document.getElementById('bk-next').addEventListener('click', () => pageFlip && pageFlip.flipNext());
+  }
+  function unmountBookNav() {
+    if (bookNavEl) { bookNavEl.remove(); bookNavEl = null; }
+  }
+
+  function showHint() {
+    if (!flipHint) return;
+    flipHint.classList.add('visible');
+    setTimeout(() => flipHint.classList.remove('visible'), 4500);
+  }
+
+  /* ---------- scroll mode ---------- */
   function initScrollMode() {
-    // Find current visible page on scroll for folio updates
     if ('IntersectionObserver' in window) {
       const io = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -142,13 +191,12 @@
           }
         });
       }, { threshold: 0.55 });
+      const pages = book.querySelectorAll('.page');
       pages.forEach(p => io.observe(p));
-      // store for cleanup
       initScrollMode._io = io;
     }
     updateFolio(1);
   }
-
   function destroyScrollMode() {
     if (initScrollMode._io) {
       initScrollMode._io.disconnect();
@@ -156,22 +204,22 @@
     }
   }
 
-  /* ---------- Mode switching ---------- */
-  function setMode(mode) {
+  /* ---------- switch ---------- */
+  async function setMode(mode) {
     if (mode === currentMode) return;
 
-    // Tear down old
     if (currentMode === 'book') destroyBookMode();
     if (currentMode === 'scroll') destroyScrollMode();
 
     body.setAttribute('data-mode', mode);
     currentMode = mode;
-    if (mode === 'book') initBookMode();
-    else initScrollMode();
+    setBtnState(mode);
 
-    // Update toggle state
-    if (btnBook) btnBook.setAttribute('aria-pressed', mode === 'book');
-    if (btnScroll) btnScroll.setAttribute('aria-pressed', mode === 'scroll');
+    if (mode === 'book') {
+      await initBookMode();
+    } else {
+      initScrollMode();
+    }
   }
 
   function userSetMode(mode) {
@@ -179,9 +227,10 @@
     setMode(mode);
   }
 
-  /* ---------- Keyboard a11y ---------- */
+  /* ---------- keyboard ---------- */
   function handleKey(e) {
     if (currentMode !== 'book' || !pageFlip) return;
+    if (document.querySelector('.pswp--open')) return; // photoswipe open
     switch (e.key) {
       case 'ArrowLeft':
       case 'PageUp':
@@ -194,51 +243,43 @@
         pageFlip.turnToPage(0); e.preventDefault(); break;
       case 'End':
         pageFlip.turnToPage(totalPages - 1); e.preventDefault(); break;
-      case 'Escape': {
-        // If a photoswipe instance is open, let it handle it
-        if (document.querySelector('.pswp--open')) return;
-        userSetMode('scroll');
-        e.preventDefault();
-        break;
-      }
+      case 'Escape':
+        userSetMode('scroll'); e.preventDefault(); break;
     }
   }
 
-  /* ---------- Resize handling ---------- */
+  /* ---------- resize ---------- */
   let resizeTimer;
   function onResize() {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
-      const width = window.innerWidth;
-      // Force scroll below breakpoint regardless of preference
-      if (width < BREAKPOINT && currentMode === 'book') {
+      const w = window.innerWidth;
+      if (w < BREAKPOINT && currentMode === 'book') {
         setMode('scroll');
-      }
-      // If user prefers book and width is now sufficient, restore
-      if (width >= BREAKPOINT) {
+      } else if (w >= BREAKPOINT) {
         const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored === 'book' && currentMode === 'scroll') {
-          setMode('book');
-        }
+        if (stored === 'book' && currentMode === 'scroll') setMode('book');
       }
-    }, 200);
+    }, 220);
   }
 
-  /* ---------- Boot ---------- */
+  /* ---------- boot — run immediately (script is at end of body, DOM is ready) ---------- */
   document.documentElement.classList.add('js-ready');
 
-  // Hook toggle buttons
   if (btnBook) btnBook.addEventListener('click', () => userSetMode('book'));
   if (btnScroll) btnScroll.addEventListener('click', () => userSetMode('scroll'));
-
-  // Defer book init until StPageFlip is loaded
-  window.addEventListener('DOMContentLoaded', () => {
-    setMode(pickMode());
-  });
 
   window.addEventListener('keydown', handleKey);
   window.addEventListener('resize', onResize);
 
-  // Expose for debugging
-  window.__onevela = { pageFlip: () => pageFlip, setMode: userSetMode };
+  // start now (don't wait for DOMContentLoaded — already fired by the time this runs)
+  setMode(pickMode());
+
+  // expose for debugging
+  window.__onevela = {
+    pageFlip: () => pageFlip,
+    setMode: userSetMode,
+    mode: () => currentMode,
+    init: initBookMode,
+  };
 })();
