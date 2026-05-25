@@ -1,0 +1,102 @@
+/* ===========================
+   StPageFlip overrides — book mode only
+   =========================== */
+
+/* The flipbook wrapper (created by StPageFlip) sits inside .stage */
+.stf__parent {
+  position: relative;
+  margin: 0 auto;
+  box-shadow: var(--shadow-page);
+  border-radius: 4px;
+  background: var(--charcoal);
+  display: block;
+}
+
+/* Hide raw pages until StPageFlip mounts them */
+body[data-mode="book"] #book > .page {
+  display: block; /* StPageFlip controls visibility */
+}
+
+/* Pages inside flipbook should have crisp shadow on the inner spine */
+.stf__block {
+  background: var(--cream);
+}
+
+.stf__item {
+  background: var(--cream);
+  /* prevent text selection during drag */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Soft inner shadow on each spread spine for that "real book" feel */
+.stf__item.--right::before,
+.stf__item.--left::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 28px;
+  pointer-events: none;
+  z-index: 5;
+}
+.stf__item.--right::before {
+  left: 0;
+  background: linear-gradient(90deg, rgba(44,40,37,0.18) 0%, rgba(44,40,37,0) 100%);
+}
+.stf__item.--left::after {
+  right: 0;
+  background: linear-gradient(270deg, rgba(44,40,37,0.18) 0%, rgba(44,40,37,0) 100%);
+}
+
+/* Suppress shadow on full-bleed photo pages (it muddies the image) */
+.stf__item:has(.page-image)::before,
+.stf__item:has(.page-image)::after { display: none; }
+
+/* Page corner curl hover hint (book mode) */
+body[data-mode="book"] .page { cursor: grab; }
+body[data-mode="book"] .page:active { cursor: grabbing; }
+
+/* Hide scroll-mode-only chrome in book mode */
+body[data-mode="book"] .stage { background: linear-gradient(180deg, #3a3530 0%, #221f1c 100%); }
+body[data-mode="book"] .page { box-shadow: none; border-radius: 0; }
+
+/* Page-flip nav arrows (custom) */
+.book-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  padding: 0 24px;
+  pointer-events: none;
+  z-index: 30;
+}
+.book-nav button {
+  pointer-events: auto;
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: rgba(44, 40, 37, 0.78);
+  color: var(--cream);
+  backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  transition: var(--transition);
+  border: 1px solid rgba(250, 247, 242, 0.15);
+}
+.book-nav button:hover {
+  background: var(--gold);
+  transform: scale(1.08);
+}
+.book-nav button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+}
+body[data-mode="scroll"] .book-nav { display: none; }
+
+@media (max-width: 1023px) {
+  /* Below 1024px JS forces data-mode="scroll" — hide any leftover book chrome */
+  .stf__parent { display: none !important; }
+  .book-nav { display: none !important; }
+}

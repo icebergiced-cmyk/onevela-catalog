@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#FAF7F2">
+<title>วันเวลา · One Vela — แคตตาลอคบ้าน คลองตำหรุ ชลบุรี</title>
+<meta name="description" content="แคตตาลอคบ้านโครงการวันเวลา · One Vela — บ้านพร้อมอยู่ คลองตำหรุ ชลบุรี เริ่ม 1.99–4.99 ล้านบาท 4 ไทป์: บ้านเดี่ยว ทาวน์โฮม บ้านแฝด">
+<meta name="keywords" content="วันเวลา, One Vela, บ้านชลบุรี, บ้านคลองตำหรุ, บ้านเดี่ยว, ทาวน์โฮม, บ้านแฝด, อมตะนคร, บางแสน, Two Build">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="icon" href="images/logo/icon-primary.jpg" type="image/jpeg">
+<link rel="apple-touch-icon" href="images/logo/icon-primary.jpg">
+
+<meta property="og:title" content="วันเวลา · One Vela — แคตตาลอคบ้าน คลองตำหรุ ชลบุรี">
+<meta property="og:description" content="บ้านพร้อมอยู่ 4 ไทป์ เริ่ม 1.99–4.99 ล้านบาท · เปิดอ่านแคตตาลอคแบบ flipbook">
+<meta property="og:image" content="images/covers/landing-hero.webp">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="th_TH">
+<meta name="twitter:card" content="summary_large_image">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "RealEstateAgent",
+  "name": "วันเวลา · One Vela",
+  "description": "โครงการบ้านจัดสรร คลองตำหรุ ชลบุรี โดย บริษัท ทู บิลด์ ดีเวลลอปเมนท์ จำกัด",
+  "telephone": "+66-92-787-4222",
+  "email": "twobuild.d@gmail.com",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "89 หมู่ 1 ตำบลคลองตำหรุ",
+    "addressLocality": "อำเภอเมืองชลบุรี",
+    "addressRegion": "ชลบุรี",
+    "postalCode": "20000",
+    "addressCountry": "TH"
+  },
+  "priceRange": "฿1.99M - ฿4.99M",
+  "image": "images/covers/landing-hero.webp"
+}
+</script>
+
+<style>
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .splash {
+    position: relative;
+    flex: 1;
+    background: var(--charcoal);
+    color: var(--cream);
+    overflow: hidden;
+    display: flex;
+  }
+  .splash-photo {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0.55;
+    z-index: 0;
+  }
+  .splash-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.85) 100%);
+    z-index: 1;
+  }
+  .splash-content {
+    position: relative;
+    z-index: 2;
+    max-width: 1080px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 48px 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .splash-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .brand-lockup {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .brand-lockup .th {
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.4px;
+  }
+  .brand-lockup .en {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold-light);
+  }
+  .top-link {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: rgba(250, 247, 242, 0.78);
+    transition: color 0.3s;
+  }
+  .top-link:hover { color: var(--gold-light); }
+
+  .splash-middle {
+    margin: auto 0;
+    max-width: 720px;
+  }
+  .splash-issue {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    letter-spacing: 3.2px;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 18px;
+  }
+  .splash-title {
+    font-size: 80px;
+    font-weight: 300;
+    line-height: 0.96;
+    letter-spacing: -2.8px;
+    margin-bottom: 22px;
+  }
+  .splash-sub {
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 1.55;
+    color: rgba(250, 247, 242, 0.82);
+    max-width: 540px;
+  }
+
+  .splash-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-top: 40px;
+  }
+  .enter-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--cream);
+    color: var(--charcoal);
+    padding: 18px 28px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.4px;
+    transition: var(--transition);
+  }
+  .enter-cta:hover {
+    background: var(--gold);
+    color: var(--cream);
+    transform: translateY(-2px);
+  }
+  .enter-cta::after {
+    content: '→';
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+  }
+  .meta-block {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  .meta-block > div {
+    border-left: 1px solid rgba(250, 247, 242, 0.22);
+    padding-left: 14px;
+  }
+  .meta-block .label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(250, 247, 242, 0.55);
+    margin-bottom: 4px;
+  }
+  .meta-block .val {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.3px;
+    color: var(--cream);
+  }
+
+  @media (max-width: 720px) {
+    .splash-content { padding: 32px 20px; }
+    .splash-title { font-size: 48px; letter-spacing: -1.6px; }
+    .splash-sub { font-size: 15px; }
+    .splash-bottom { flex-direction: column; align-items: stretch; }
+    .meta-block { gap: 18px; }
+    .meta-block > div { padding-left: 12px; }
+  }
+</style>
+</head>
+<body>
+<main class="splash" role="main">
+  <img class="splash-photo" src="images/covers/landing-hero.webp" alt="บ้าน 2 ชั้น โครงการวันเวลา ชลบุรี ในแสง Golden Hour">
+  <div class="splash-overlay"></div>
+
+  <div class="splash-content">
+    <div class="splash-top">
+      <div class="brand-lockup">
+        <span class="th">วันเวลา</span>
+        <span class="en">One Vela · Chonburi</span>
+      </div>
+      <a href="#contact" class="top-link">นัดชมโครงการ →</a>
+    </div>
+
+    <section class="splash-middle">
+      <div class="splash-issue">Issue 01 · 2026 · Catalog</div>
+      <h1 class="splash-title">บ้านสำหรับวันเวลาดีๆ ของครอบครัว</h1>
+      <p class="splash-sub">แคตตาลอคบ้านเล่มแรก โครงการวันเวลา · One Vela คลองตำหรุ ชลบุรี — บ้านพร้อมอยู่ 4 แบบ เริ่มต้นที่ 1.99 ล้านบาท ให้คุณเริ่มต้นบ้านในงบที่ใช่</p>
+    </section>
+
+    <div class="splash-bottom">
+      <a href="catalog.html" class="enter-cta">เปิดอ่านแคตตาลอค</a>
+      <div class="meta-block">
+        <div>
+          <div class="label">Price From</div>
+          <div class="val">฿1.99M – ฿4.99M</div>
+        </div>
+        <div>
+          <div class="label">Types</div>
+          <div class="val">4 แบบบ้าน</div>
+        </div>
+        <div>
+          <div class="label">Developer</div>
+          <div class="val">Two Build Development</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<a id="contact" class="sr-only">contact</a>
+<script>
+// Subtle parallax on splash photo
+const photo = document.querySelector('.splash-photo');
+let raf;
+window.addEventListener('mousemove', (e) => {
+  if (raf) return;
+  raf = requestAnimationFrame(() => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 18;
+    const y = (e.clientY / window.innerHeight - 0.5) * 12;
+    photo.style.transform = `translate(${x}px, ${y}px) scale(1.06)`;
+    raf = null;
+  });
+});
+</script>
+</body>
+</html>

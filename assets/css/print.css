@@ -1,0 +1,101 @@
+/* ===========================
+   Print stylesheet — A4 handout PDF export
+   Chrome → Print → Save as PDF
+   =========================== */
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  /* Hide everything that isn't a magazine page */
+  .cat-nav,
+  .book-nav,
+  .flip-hint,
+  .pswp,
+  .pswp-trigger,
+  script,
+  noscript {
+    display: none !important;
+  }
+
+  /* Reset stage for print */
+  body {
+    background: white;
+    margin: 0; padding: 0;
+  }
+  .stage {
+    background: white;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Each section.page becomes one printed A4 page */
+  #book > .page {
+    width: 210mm !important;
+    height: 297mm !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 22mm 20mm !important;
+    page-break-after: always;
+    page-break-inside: avoid;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-adjust: exact;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    page-break-inside: avoid;
+  }
+  #book > .page:last-child { page-break-after: auto; }
+
+  /* Full-bleed image pages — no padding */
+  #book > .page.page-image,
+  #book > .page.cover {
+    padding: 0 !important;
+  }
+  #book > .page.page-image .photo-bleed,
+  #book > .page.cover .photo-bleed {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+  }
+  #book > .page.page-image .photo-caption,
+  #book > .page.cover .cover-content {
+    padding: 18mm 16mm !important;
+  }
+
+  /* Make photoswipe triggers fully invisible */
+  .pswp-trigger { display: none !important; }
+
+  /* Ensure photo galleries print correctly */
+  .gallery-1plus2, .gallery-2 {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Force backgrounds on dark / sage / beige pages */
+  .page-dark, .cover, .back-cover {
+    background-color: #2C2825 !important;
+    color: #FAF7F2 !important;
+  }
+  .page-sage {
+    background-color: #7A8471 !important;
+    color: #FAF7F2 !important;
+  }
+  .page-beige {
+    background-color: #E8DFD0 !important;
+    color: #2C2825 !important;
+  }
+
+  /* Anchors should not show URLs after text */
+  a[href]:after { content: none !important; }
+
+  /* Page foot shouldn't be cut */
+  .page-foot { margin-top: auto !important; }
+}
