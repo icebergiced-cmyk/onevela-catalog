@@ -2,6 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>/</loc><priority>1.0</priority><changefreq>monthly</changefreq></url>
   <url><loc>/catalog.html</loc><priority>0.95</priority><changefreq>monthly</changefreq></url>
+  <url><loc>/promo-999.html</loc><priority>0.98</priority><changefreq>weekly</changefreq></url>
   <url><loc>/catalog.html#page-cover</loc><priority>0.9</priority></url>
   <url><loc>/catalog.html#page-location</loc><priority>0.8</priority></url>
   <url><loc>/catalog.html#page-masterplan</loc><priority>0.8</priority></url>

@@ -15,8 +15,8 @@
 <link rel="icon" href="images/logo/icon-primary.jpg" type="image/jpeg">
 <link rel="apple-touch-icon" href="images/logo/icon-primary.jpg">
 
-<meta property="og:title" content="วันเวลา · One Vela — แคตตาลอคบ้าน คลองตำหรุ ชลบุรี">
-<meta property="og:description" content="บ้านพร้อมอยู่ 4 ไทป์ เริ่ม 1.99–4.99 ล้านบาท · เปิดอ่านแคตตาลอคแบบ flipbook">
+<meta property="og:title" content="วันเวลา · One Vela — จองบ้าน 999 บาท · บ้านพร้อมอยู่ คลองตำหรุ ชลบุรี">
+<meta property="og:description" content="โปร 30 มิ.ย. – 31 ส.ค. 69 · จองบ้านวันเวลา 999 บาท · ครึ่งของรัฐ ครึ่งของเรา · บ้านพร้อมอยู่ 4 ไทป์ เริ่ม 1.99M">
 <meta property="og:image" content="images/covers/landing-hero.webp">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="th_TH">
@@ -49,6 +49,40 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+  }
+
+  /* Promo strip — sticky on top, very visible */
+  .promo-strip {
+    background: var(--gold);
+    color: var(--cream);
+    padding: 11px 22px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    transition: var(--transition);
+    z-index: 100;
+  }
+  .promo-strip:hover { background: var(--charcoal); color: var(--gold-light); }
+  .promo-strip strong { font-weight: 600; }
+  .promo-strip .badge {
+    background: var(--cream);
+    color: var(--gold);
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.4px;
+  }
+  .promo-strip .arrow { font-family: 'Inter', sans-serif; }
+  @media (max-width: 640px) {
+    .promo-strip { font-size: 12px; padding: 10px 14px; gap: 8px; }
+    .promo-strip .badge { font-size: 9px; }
   }
   .splash {
     position: relative;
@@ -208,6 +242,11 @@
 </style>
 </head>
 <body>
+<a href="promo-999.html" class="promo-strip" aria-label="โปรโมชั่นจองบ้าน 999 บาท">
+  <span class="badge">PROMO</span>
+  <span>จองบ้าน <strong>999 บาท</strong> · ครึ่งของรัฐ ครึ่งของเรา · ถึง 31 ส.ค. 69</span>
+  <span class="arrow">→</span>
+</a>
 <main class="splash" role="main">
   <img class="splash-photo" src="images/covers/landing-hero.webp" alt="บ้าน 2 ชั้น โครงการวันเวลา ชลบุรี ในแสง Golden Hour">
   <div class="splash-overlay"></div>
